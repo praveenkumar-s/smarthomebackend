@@ -72,8 +72,8 @@ def handle_mqtt_message(client, userdata, message):
         payload=message.payload.decode()
     )
     #
-    print 'mqtt message recieved'
-    print data
+    
+    
     databank[message.topic]=message.payload.decode()
     #socketio.emit('mqtt_message', data=data)
 
