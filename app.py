@@ -4,8 +4,10 @@ from flask import Flask, render_template
 from flask_mqtt import Mqtt
 from flask_socketio import SocketIO
 from flask_bootstrap import Bootstrap
-
+import time
 from flask import request
+import temp_listener
+from subprocess import Popen, PIPE
 
 eventlet.monkey_patch()
 
@@ -28,7 +30,7 @@ app.config['MQTT_TLS_ENABLED'] = False
 mqtt = Mqtt(app)
 socketio = SocketIO(app)
 bootstrap = Bootstrap(app)
-
+databank={}
 
 @app.route('/')
 def index():
@@ -46,10 +48,21 @@ def publish_data():
     mqtt.publish(data['topic'], data['message'])
     return '0'
 
+@app.route('/getdata',methods=['GET'])
+def getdata():
+    channel=request.args.get('channel')
+    mqtt.publish(channel,'GETDATA')
+    p = Popen(['python', 'temp_listener.py',channel],shell = False, stdout=PIPE)
+    if(p.stdout is not None):
+        return p.stdout.readline()
+    else:
+        return '0'
+
 @socketio.on('subscribe')
 def handle_subscribe(json_str):
     data = json.loads(json_str)
     mqtt.subscribe(data['topic'])
+    
 
 
 @mqtt.on_message()
@@ -58,8 +71,11 @@ def handle_mqtt_message(client, userdata, message):
         topic=message.topic,
         payload=message.payload.decode()
     )
-    socketio.emit('mqtt_message', data=data)
-
+    #
+    print 'mqtt message recieved'
+    print data
+    databank[message.topic]=message.payload.decode()
+    #socketio.emit('mqtt_message', data=data)
 
 @mqtt.on_log()
 def handle_logging(client, userdata, level, buf):
