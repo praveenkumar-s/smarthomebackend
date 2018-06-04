@@ -37,10 +37,6 @@ def index():
     return render_template('index.html')
 
 
-@socketio.on('publish')
-def handle_publish(json_str):
-    data = json.loads(json_str)
-    mqtt.publish(data['topic'], data['message'])
 
 @app.route('/publish',methods=['POST'])
 def publish_data():
@@ -58,29 +54,11 @@ def getdata():
     else:
         return '0'
 
-@socketio.on('subscribe')
-def handle_subscribe(json_str):
-    data = json.loads(json_str)
-    mqtt.subscribe(data['topic'])
+
     
 
 
-@mqtt.on_message()
-def handle_mqtt_message(client, userdata, message):
-    data = dict(
-        topic=message.topic,
-        payload=message.payload.decode()
-    )
-    #
-    
-    
-    databank[message.topic]=message.payload.decode()
-    #socketio.emit('mqtt_message', data=data)
-
-@mqtt.on_log()
-def handle_logging(client, userdata, level, buf):
-    print(level, buf)
 
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5000, use_reloader=True, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5000, use_reloader=True, debug=False)
