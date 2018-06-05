@@ -19,9 +19,9 @@ app.config['MQTT_PASSWORD'] = ''
 app.config['MQTT_KEEPALIVE'] = 5
 app.config['MQTT_TLS_ENABLED'] = False
 
-mqtt = Mqtt(app)
-bootstrap = Bootstrap(app)
-databank={}
+#mqtt = Mqtt(app)
+#bootstrap = Bootstrap(app)
+#databank={}
 
 
 @app.route('/')
