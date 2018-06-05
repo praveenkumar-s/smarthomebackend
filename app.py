@@ -42,7 +42,7 @@ def getdata():
     mqtt.publish(channel,'GETDATA')
     p = Popen(['python', 'temp_listener.py',channel],shell = False, stdout=PIPE)
     if(p.stdout is not None):
-        return p.stdout.readline()
+        return str(p.stdout.readline())
     else:
         return '0'
 
